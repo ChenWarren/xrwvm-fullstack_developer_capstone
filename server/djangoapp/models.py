@@ -13,14 +13,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 # - Any other fields you would like to include in car make model
 # - __str__ method to print a car make object
 class CarMake(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=100)
     description = models.TextField()
-    founded = models.DateField(blank=True, null=True)  # Year the company was founded
-    headquarters = models.CharField(max_length=255, blank=True, null=True)  # Location of headquarters
-    website = models.URLField(null=True, blank=True)
+    # Other fields as needed
 
     def __str__(self):
-        return self.name
+        return self.name  # Return the name as the string representation
 
 
 # <HINT> Create a Car Model model `class CarModel(models.Model):`:
@@ -33,12 +31,21 @@ class CarMake(models.Model):
 # - Any other fields you would like to include in car model
 # - __str__ method to print a car make object
 class CarModel(models.Model):
-    make = models.ForeignKey(CarMake, on_delete=models.CASCADE, related_name='car_models')
-    name = models.CharField(max_length=255)
-    type = models.CharField(max_length=20, choices=(('Sedan', 'Sedan'), ('SUV', 'SUV'), ('Hatchback', 'Hatchback'), ('Coupe', 'Coupe'), ('Wagon', 'Wagon')))
-    year = models.IntegerField()
-    engine_size = models.IntegerField(blank=True, null=True)  # in cubic centimeters
-    fuel_type = models.CharField(max_length=10, blank=True, null=True, choices=(('Gasoline', 'Gasoline'), ('Diesel', 'Diesel'), ('Electric', 'Electric'), ('Hybrid', 'Hybrid')))
+    car_make = models.ForeignKey(CarMake, on_delete=models.CASCADE)  # Many-to-One relationship
+    name = models.CharField(max_length=100)
+    CAR_TYPES = [
+        ('SEDAN', 'Sedan'),
+        ('SUV', 'SUV'),
+        ('WAGON', 'Wagon'),
+        # Add more choices as required
+    ]
+    type = models.CharField(max_length=10, choices=CAR_TYPES, default='SUV')
+    year = models.IntegerField(default=2023,
+        validators=[
+            MaxValueValidator(2023),
+            MinValueValidator(2015)
+        ])
+    # Other fields as needed
 
     def __str__(self):
-        return '{} - {}'.format(self.make.name, self.name)
+        return self.name  # Return the name as the string representation
